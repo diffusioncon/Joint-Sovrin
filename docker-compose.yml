@@ -1,0 +1,18 @@
+version: "2"
+
+services:
+  node-vcx:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    privileged: true
+    image: 164629628951.dkr.ecr.eu-central-1.amazonaws.com/sovrin-test
+    volumes:
+      - "./config:/vcx-config"
+      - "./src:/app/src"
+      - "./indy-data:/root/.indy_client"
+      - "./data:/data"
+    command: nodemon src/vcx-server.js
+    ports:
+      - "3232:3232"
+      - "5000:5000"

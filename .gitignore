@@ -1,0 +1,7 @@
+/lib
+/config
+/data
+/indy-data
+.idea
+/node_modules
+/*.tgz
