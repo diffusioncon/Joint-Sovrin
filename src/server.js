@@ -39,7 +39,20 @@ const {
 
 app.get('/', (req, res) => res.send('hello vcx'));
 
-app.get('/api/connect', async (req, res) => {
+app.get('/connected', async (req, res) => {
+    const connectionId = req.query.id;
+    const connection = await getConnection(connectionId);
+
+    if (!connection) {
+        res.send({status: false});
+        res.end();
+    } else {
+        await connection.updateState();
+        res.send({status: await connection.getState()});
+    }
+});
+
+app.get('/connect', async (req, res) => {
     const connectionId = req.query.id;
     const connection = await makeConnection('QR', connectionId);
     const qrCode = await getInviteQrCode(connection);
@@ -48,7 +61,7 @@ app.get('/api/connect', async (req, res) => {
     await saveConnection(connectionId, connection);
 });
 
-app.post('/api/proof', async (req, res) => {
+app.post('/proof', async (req, res) => {
     const connectionId = req.body.id;
     const proofId = 'proof-request';
     const connection = await getConnection(connectionId);
@@ -81,11 +94,21 @@ app.post('/api/proof', async (req, res) => {
     console.log('Processing accepted proof request');
     const data = await processAcceptedProof(proof, connection);
 
-    let response = {};
-    data.forEach(field => response[field.name] = field.raw);
+    let proofFields = {};
+    let fields = data.requested_proof.revealed_attrs;
+
+    Object.keys(fields).forEach(key => {
+        proofFields[key] = fields[key].raw;
+    });
+
+    const response = {
+        fields: proofFields,
+        proof: data
+    };
 
     io.emit('proofResult', response);
     console.log(response);
+    res.end();
 });
 
 initializeVcx(LIBSOVTOKEN_PATH, VCX_CONFIG_PATH).then(() => {

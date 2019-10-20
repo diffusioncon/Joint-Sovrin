@@ -35,9 +35,11 @@ async function processAcceptedProof(proof, connection) {
     const proofData = await proof.serialize();
     const proofState = proofResult.proofState;
 
+    console.log(proofData);
+
     const proofAttrs = JSON.parse(
         proofData.data.proof.libindy_proof
-    ).requested_proof.revealed_attrs;
+    );
 
     return proofAttrs;
 }
