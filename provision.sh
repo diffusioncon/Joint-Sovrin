@@ -1,0 +1,2 @@
+curl -f https://raw.githubusercontent.com/sovrin-foundation/sovrin/stable/sovrin/pool_transactions_sandbox_genesis >> config/genesis.tnx
+docker-compose exec vcx-node python3 /usr/share/libvcx/provision_agent_keys.py "https://eas01.pps.evernym.com" 12345
